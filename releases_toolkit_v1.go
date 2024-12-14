@@ -2,7 +2,7 @@ package fred_go_toolkit
 
 import (
 	"errors"
-	"io/ioutil"
+	"io"
 )
 
 // Release is a single instance of a release of FRED economic data.
@@ -184,7 +184,7 @@ func (f *FredClient) GetReleaseTables(params map[string]interface{}) (string, er
 		return "", err
 	}
 
-	res, err := ioutil.ReadAll(resp.Body)
+	res, err := io.ReadAll(resp.Body)
 	if err != nil {
 		f.log("[GetReleaseTables] READ ERROR: " + err.Error())
 		return "", errors.New(errorLibraryFail)

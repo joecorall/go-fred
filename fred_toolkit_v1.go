@@ -70,7 +70,7 @@ func CreateFredClient(config FredConfig) (*FredClient, error) {
 	if config.LogFile != "" {
 		f, err := os.OpenFile(config.LogFile, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 		if err != nil {
-			fmt.Println("Error opening log file: %v", err.Error())
+			fmt.Printf("error opening log file: %v", err.Error())
 			return nil, err
 		}
 		log.SetOutput(f)
@@ -88,7 +88,7 @@ func CreateFredClient(config FredConfig) (*FredClient, error) {
 
 func validateConfig(config *FredConfig) error {
 
-	if sameStr(config.APIKey, "") {
+	if strings.Compare(config.APIKey, "") == 0 {
 		return errors.New(errorNoAPIKey)
 	}
 
@@ -120,7 +120,7 @@ func (f *FredClient) UpdateAPIKEY(APIKey string) error {
 // validateAPIKEY validates that an APIKEY exists.
 
 func (f *FredClient) validateAPIKEY() error {
-	if sameStr(f.APIKEY, "") {
+	if strings.Compare(f.APIKEY, "") == 0 {
 		return errors.New(errorNoAPIKey)
 	}
 	return nil
@@ -194,7 +194,7 @@ func (f *FredClient) operate(params map[string]interface{}, paramType string) (*
 
 	obj, err = f.decodeObj(resp, obj)
 	if err != nil {
-		fmt.Printf("[operate] decodeObj Error " + err.Error())
+		fmt.Printf("[operate] decodeObj error: %s", err.Error())
 		return nil, err
 	}
 
@@ -209,33 +209,31 @@ func (f *FredClient) formatUrl(url string, params map[string]interface{}, paramT
 
 	if len(params) != 0 {
 		for paramKey, paramVal := range params {
-			if !sameStr(paramKey, "") || !sameStr(paramVal.(string), "") {
-				for _, param := range paramsLookup[paramType][paramLookupParams].([]string) {
-					paramOp := "&"
-					if sameStr(paramKey, param) {
-						if firstParam {
-							paramOp = "?"
-							firstParam = false
-						}
-
-						val := ""
-						kind := reflect.TypeOf(paramVal).Kind()
-
-						switch kind {
-						case reflect.String:
-							val = paramVal.(string)
-							val = strings.Replace(val, " ", "+", -1)
-							break
-						case reflect.Int:
-							val = strconv.Itoa(paramVal.(int))
-							break
-						case reflect.Bool:
-							val = strconv.FormatBool(paramVal.(bool))
-							break
-						}
-
-						url += (paramOp + paramKey + "=" + val)
+			if strings.Compare(paramKey, "") == 0 && strings.Compare(paramVal.(string), "") == 0 {
+				continue
+			}
+			for _, param := range paramsLookup[paramType][paramLookupParams].([]string) {
+				paramOp := "&"
+				if strings.Compare(paramKey, param) == 0 {
+					if firstParam {
+						paramOp = "?"
+						firstParam = false
 					}
+
+					val := ""
+					kind := reflect.TypeOf(paramVal).Kind()
+
+					switch kind {
+					case reflect.String:
+						val = paramVal.(string)
+						val = strings.Replace(val, " ", "+", -1)
+					case reflect.Int:
+						val = strconv.Itoa(paramVal.(int))
+					case reflect.Bool:
+						val = strconv.FormatBool(paramVal.(bool))
+					}
+
+					url += (paramOp + paramKey + "=" + val)
 				}
 			}
 		}
@@ -252,13 +250,6 @@ func (f *FredClient) formatUrl(url string, params map[string]interface{}, paramT
 	url += "api_key=" + f.APIKEY + "&file_type=" + fileType
 
 	return url
-}
-
-func sameStr(str1 string, str2 string) bool {
-	if strings.Compare(str1, str2) == 0 {
-		return true
-	}
-	return false
 }
 
 func (f *FredClient) log(logMes string) {
