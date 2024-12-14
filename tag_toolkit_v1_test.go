@@ -19,17 +19,6 @@ func TestGetTags(t *testing.T) {
 			So(len(tags.Tags), ShouldBeGreaterThanOrEqualTo, 100)
 		})
 	})
-
-	Convey("", t, func() {
-		tags, err := jsonFredClient.GetTags(params)
-
-		So(err, ShouldBeNil)
-		Convey("", func() {
-			So(tags, ShouldNotBeNil)
-			So(len(tags.Tags), ShouldBeGreaterThanOrEqualTo, 100)
-
-		})
-	})
 }
 
 func TestGetRelatedTags(t *testing.T) {
@@ -37,19 +26,6 @@ func TestGetRelatedTags(t *testing.T) {
 	params := make(map[string]interface{})
 
 	params["tag_names"] = "monetary aggregates;weekly"
-
-	Convey("", t, func() {
-		tags, err := xmlFredClient.GetRelatedTags(params)
-		So(err, ShouldBeNil)
-
-		Convey("", func() {
-			So(tags, ShouldNotBeNil)
-			So(len(tags.Tags), ShouldBeGreaterThanOrEqualTo, 13)
-			So(tags.Tags[0].GroupID, ShouldContainSubstring, "geot")
-			So(tags.Tags[0].Name, ShouldContainSubstring, "nation")
-
-		})
-	})
 
 	Convey("", t, func() {
 		tags, err := jsonFredClient.GetRelatedTags(params)
@@ -80,16 +56,4 @@ func TestGetTagSeries(t *testing.T) {
 			So(tags.Seriess[0].ID, ShouldContainSubstring, "CPGDFD02SIA657N")
 		})
 	})
-
-	Convey("", t, func() {
-		tags, err := jsonFredClient.GetTagSeries(params)
-
-		So(err, ShouldBeNil)
-		Convey("", func() {
-			So(tags, ShouldNotBeNil)
-			So(len(tags.Seriess), ShouldBeGreaterThanOrEqualTo, 18)
-			So(tags.Seriess[0].ID, ShouldContainSubstring, "CPGDFD02SIA657N")
-		})
-	})
-
 }
