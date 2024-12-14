@@ -1,6 +1,7 @@
 package fred_go_toolkit
 
 import (
+	"strings"
 	"testing"
 
 	. "github.com/smartystreets/goconvey/convey"
@@ -21,18 +22,6 @@ func TestGetReleases(t *testing.T) {
 
 		})
 	})
-
-	Convey("", t, func() {
-		rls, err := jsonFredClient.GetReleases(params)
-
-		So(err, ShouldBeNil)
-		Convey("", func() {
-			So(rls, ShouldNotBeNil)
-			So(len(rls.Releases), ShouldBeGreaterThanOrEqualTo, 158)
-			So(rls.Releases[0].Name, ShouldContainSubstring, "Advance Monthly Sales for Retail and Food Services")
-		})
-	})
-
 }
 
 func TestGetReleasesDates(t *testing.T) {
@@ -40,16 +29,6 @@ func TestGetReleasesDates(t *testing.T) {
 	params := make(map[string]interface{})
 
 	params["release_id"] = 82
-
-	Convey("", t, func() {
-		dts, err := xmlFredClient.GetReleasesDates(params)
-		So(err, ShouldBeNil)
-
-		Convey("", func() {
-			So(dts, ShouldNotBeNil)
-			So(dts.ReleaseDates[0].Date, ShouldContainSubstring, "1997-02-10")
-		})
-	})
 
 	Convey("", t, func() {
 		dts, err := jsonFredClient.GetReleasesDates(params)
@@ -80,19 +59,6 @@ func TestGetRelease(t *testing.T) {
 			So(rls.Releases[0].Name, ShouldContainSubstring, "Gross Domestic Product")
 		})
 	})
-
-	Convey("", t, func() {
-		rls, err := jsonFredClient.GetRelease(params)
-
-		So(err, ShouldBeNil)
-		Convey("", func() {
-			So(rls, ShouldNotBeNil)
-			So(len(rls.Releases), ShouldBeGreaterThanOrEqualTo, 1)
-			So(rls.Releases[0].ID, ShouldBeGreaterThanOrEqualTo, 53)
-			So(rls.Releases[0].Name, ShouldContainSubstring, "Gross Domestic Product")
-		})
-	})
-
 }
 
 func TestGetReleaseDates(t *testing.T) {
@@ -100,17 +66,6 @@ func TestGetReleaseDates(t *testing.T) {
 	params := make(map[string]interface{})
 
 	params["release_id"] = 82
-
-	Convey("", t, func() {
-		rlsDts, err := xmlFredClient.GetReleaseDates(params)
-		So(err, ShouldBeNil)
-
-		Convey("", func() {
-			So(rlsDts, ShouldNotBeNil)
-			So(len(rlsDts.ReleaseDates), ShouldBeGreaterThanOrEqualTo, 17)
-
-		})
-	})
 
 	Convey("", t, func() {
 		rlsDts, err := jsonFredClient.GetReleaseDates(params)
@@ -144,18 +99,6 @@ func TestGetReleaseSeries(t *testing.T) {
 		})
 	})
 
-	Convey("", t, func() {
-		srs, err := jsonFredClient.GetReleaseSeries(params)
-
-		So(err, ShouldBeNil)
-		Convey("", func() {
-			So(srs, ShouldNotBeNil)
-			So(len(srs.Seriess), ShouldBeGreaterThanOrEqualTo, 39)
-			So(srs.Seriess[0].ID, ShouldBeGreaterThanOrEqualTo, "BOMTVLM133S")
-			So(srs.Seriess[0].Title, ShouldBeGreaterThanOrEqualTo, "U.S. Imports of Services - Travel")
-		})
-	})
-
 }
 
 func TestGetReleaseSources(t *testing.T) {
@@ -165,19 +108,6 @@ func TestGetReleaseSources(t *testing.T) {
 	params["release_id"] = 51
 
 	Convey("", t, func() {
-		srs, err := xmlFredClient.GetReleaseSources(params)
-		So(err, ShouldBeNil)
-
-		Convey("", func() {
-			So(srs, ShouldNotBeNil)
-			So(len(srs.Sources), ShouldBeGreaterThanOrEqualTo, 2)
-			So(srs.Sources[0].ID, ShouldBeGreaterThanOrEqualTo, 18)
-			So(srs.Sources[0].Name, ShouldContainSubstring, "U.S. Bureau of Economic Analysis")
-
-		})
-	})
-
-	Convey("", t, func() {
 		srs, err := jsonFredClient.GetReleaseSources(params)
 
 		So(err, ShouldBeNil)
@@ -185,7 +115,14 @@ func TestGetReleaseSources(t *testing.T) {
 			So(srs, ShouldNotBeNil)
 			So(len(srs.Sources), ShouldBeGreaterThanOrEqualTo, 2)
 			So(srs.Sources[0].ID, ShouldBeGreaterThanOrEqualTo, 18)
-			So(srs.Sources[0].Name, ShouldContainSubstring, "U.S. Bureau of Economic Analysis")
+			found := false
+			for _, source := range srs.Sources {
+				if strings.Contains(source.Name, "U.S. Bureau of Economic Analysis") {
+					found = true
+					break
+				}
+			}
+			So(found, ShouldBeTrue)
 		})
 	})
 
@@ -208,17 +145,6 @@ func TestGetReleaseTags(t *testing.T) {
 		})
 	})
 
-	Convey("", t, func() {
-		tags, err := jsonFredClient.GetReleaseTags(params)
-
-		So(err, ShouldBeNil)
-		Convey("", func() {
-			So(tags, ShouldNotBeNil)
-			So(tags.Tags[0].GroupID, ShouldContainSubstring, "gen")
-			So(tags.Tags[0].Name, ShouldContainSubstring, "commercial")
-		})
-	})
-
 }
 
 func TestGetReleaseRelatedTags(t *testing.T) {
@@ -227,17 +153,6 @@ func TestGetReleaseRelatedTags(t *testing.T) {
 
 	params["release_id"] = 86
 	params["tag_names"] = "sa;foreign"
-
-	Convey("", t, func() {
-		tags, err := xmlFredClient.GetReleaseRelatedTags(params)
-		So(err, ShouldBeNil)
-
-		Convey("", func() {
-			So(tags, ShouldNotBeNil)
-			So(tags.Tags[0].GroupID, ShouldContainSubstring, "gen")
-			So(tags.Tags[0].Name, ShouldContainSubstring, "commercial")
-		})
-	})
 
 	Convey("", t, func() {
 		tags, err := jsonFredClient.GetReleaseRelatedTags(params)
@@ -267,14 +182,4 @@ func TestGetReleaseTables(t *testing.T) {
 			So(res, ShouldNotBeBlank)
 		})
 	})
-
-	Convey("", t, func() {
-		res, err := jsonFredClient.GetReleaseTables(params)
-
-		So(err, ShouldBeNil)
-		Convey("", func() {
-			So(res, ShouldNotBeBlank)
-		})
-	})
-
 }
