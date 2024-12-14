@@ -1,0 +1,35 @@
+name: lint-test
+
+on:
+  push:
+    paths-ignore:
+      - '**/*.md'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+
+  lint-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: latest
+      
+      - name: Install dependencies
+        run: go get .
+
+      - name: Test with the Go CLI
+        run: go test -v -race .
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
